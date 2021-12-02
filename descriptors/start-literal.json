@@ -45,15 +45,6 @@
                 "Parameters": {
                     "SuccessExpression": ">80%"
                 }
-            },
-            {
-                "Name": "Noop"
             }
-        ],
-        "FinalReporters": [
-            {
-                "Name": "noop"
-            }
-        ]
     }
 }
