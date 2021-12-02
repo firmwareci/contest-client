@@ -1,0 +1,128 @@
+JobName: QEMU Boot Test
+Runs: 1
+RunInterval: 60s
+Tags: ["coreboot", "qemu", "boot"]
+TestDescriptors:
+    -   TargetManagerName: TargetList
+        TargetManagerAcquireParameters:
+            Targets:
+                - ID: "1234"
+                - ID: "0071"
+            MinNumberDevices: 1
+            MaxNumberDevices: 1
+        TargetManagerReleaseParameters:
+        TestFetcherName: literal
+        TestFetcherFetchParameters:
+            TestName: Build and Boot coreboot
+            Steps:
+                -   name: cmd
+                    label: Delete local Files coreboot
+                    parameters:
+                        executable: [rm]
+                        args: ["-rf", "/tmp/coreboot-spr-sp-{{ .ID }}/"]
+                -   name: cmd
+                    label: Delete local Files assets
+                    parameters:
+                        executable: [rm]
+                        args: ["-rf", "/tmp/assets-spr-sp-{{ .ID }}/"]
+                -   name: cmd
+                    label: Cloning coreboot
+                    parameters:
+                        executable: [git]
+                        args: ["clone","git@github.com:coreboot/coreboot.git", "/tmp/coreboot-spr-sp-{{ .ID }}/"]
+                        expect: ["Cloning into"]
+
+                -   name: cmd
+                    label: Cloning submodules
+                    parameters:
+                        executable: [git]
+                        args: ["submodule","update", "--checkout", "--init"]
+                        dir: ["/tmp/coreboot-spr-sp-{{ .ID }}/"]
+                        expect: ["Cloning into"]
+
+                -   name: cmd
+                    label: Adding 9elements remote
+                    parameters:
+                        executable: [git]
+                        args: ["remote","add", "9elements", "git@github.com:9elements/coreboot-spr-sp.git"]
+                        dir: ["/tmp/coreboot-spr-sp-{{ .ID }}/"]
+
+                -   name: cmd
+                    label: Fetching 9elements data
+                    parameters:
+                        executable: [git]
+                        args: ["fetch","--all"]
+                        dir: ["/tmp/coreboot-spr-sp-{{ .ID }}/"]
+                        expect: ["Fetching 9elements"]
+
+                -   name: cmd
+                    label: Checkout to the right commit
+                    parameters:
+                        executable: [git]
+                        args: ["checkout","e4a6f6a56ebff724e29a195ec408683208d1eb99"]
+                        dir: ["/tmp/coreboot-spr-sp-{{ .ID }}/"]
+                        expect: ["switching to the right commit"]
+
+                -   name: cmd
+                    label: Cloning all assets
+                    parameters:
+                        executable: [git]
+                        args: ["clone","git@github.com:9elements/contest-job-assets", "/tmp/assets-spr-sp-{{ .ID }}/"]
+                        expect: ["Cloning into"]
+
+                -   name: cmd
+                    label: Config into coreboot folder
+                    parameters:
+                        executable: [cp]
+                        args: ["/tmp/assets-spr-sp-{{ .ID }}/configs/defconfig_coreboot-spr-sp_qemu-build", "configs/defconfig"]
+                        dir: ["/tmp/coreboot-spr-sp-{{ .ID }}/"]
+
+                -   name: cmd
+                    label: Creating the .config file
+                    parameters:
+                        executable: [make]
+                        args: ["defconfig"]
+                        dir: ["/tmp/coreboot-spr-sp-{{ .ID }}/"]
+                        expect: ["configuration written to"]
+
+                -   name: cmd
+                    label: uroot into coreboot folder
+                    parameters:
+                        executable: [cp]
+                        args: ["/tmp/assets-spr-sp-{{ .ID }}/initramfs.linux_amd64.cpio", "initramfs.linux_amd64.cpio"]
+                        dir: ["/tmp/coreboot-spr-sp-{{ .ID }}/"]
+
+                -   name: cmd
+                    label: qemu script into folder
+                    parameters:
+                        executable: [cp]
+                        args: ["/tmp/assets-spr-sp-{{ .ID }}/qemuscript.sh", "qemuscript.sh"]
+                        dir: ["/tmp/coreboot-spr-sp-{{ .ID }}/"]
+
+                -   name: cmd
+                    label: Building the toolchain
+                    parameters:
+                        executable: [make]
+                        args: ["crossgcc-i386","CPUS=16"]
+                        dir: ["/tmp/coreboot-spr-sp-{{ .ID }}/"]
+                        expect: ["You can now run IASL ACPI compiler from"]
+
+                -   name: cmd
+                    label: Build coreboot
+                    parameters:
+                        executable: [make]
+                        dir: ["/tmp/coreboot-spr-sp-{{ .ID }}/"]
+
+                -   name: cmd
+                    label: emulate coreboot
+                    parameters:
+                        executable: [sh]
+                        args: ["qemuscript.sh"]
+                        dir: ["/tmp/coreboot-spr-sp-{{ .ID }}/"]   
+                        expect: ["Jumping to boot code"]
+
+Reporting:
+    RunReporters:
+        -   name: TargetSuccess
+            parameters:
+                SuccessExpression: "=100%"

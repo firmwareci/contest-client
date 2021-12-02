@@ -1,0 +1,9 @@
+{
+    "steps": [
+        {
+            "name": "randecho",
+            "label": "some label"
+        }
+    ]
+}
+
