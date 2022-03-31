@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/linuxboot/contest/cmds/clients/contestcli/cli"
+	"github.com/firmwareci/contest-client/cli"
 )
 
 // Unauthenticated, unencrypted sample HTTP client for ConTest.
