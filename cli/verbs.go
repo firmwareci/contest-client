@@ -85,6 +85,23 @@ func run(requestor string, transport transport.Transport, stdout io.Writer) erro
 			if err != nil {
 				return err
 			}
+
+			//write the result into it's own file so that firmwareci
+			//can more easily parse the results
+			buffer.Reset()
+			if err := encoder.Encode(resp); err != nil {
+				return err
+			}
+
+			jobLog, err := os.Create("/logs/job.result")
+			defer jobLog.Close()
+
+			if err != nil {
+				return fmt.Errorf("Could not Create job Log file: %w", err)
+			}
+			if _, err := jobLog.WriteString(buffer.String()); err != nil {
+				return fmt.Errorf("Could not write to job Log file: %w", err)
+			}
 		}
 	case "stop":
 		jobID, err := parseJob(flagSet.Arg(1))
