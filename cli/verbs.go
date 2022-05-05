@@ -11,6 +11,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"html/template"
 	"io"
 	"io/ioutil"
 	"os"
@@ -18,7 +19,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/firmwareci/contest-client/pkg/download"
 	"github.com/firmwareci/contest-client/pkg/env"
+
 	"github.com/linuxboot/contest/pkg/api"
 	"github.com/linuxboot/contest/pkg/config"
 	"github.com/linuxboot/contest/pkg/event"
@@ -36,6 +39,7 @@ func run(requestor string, transport transport.Transport, stdout io.Writer) erro
 	var err error
 	switch verb {
 	case "start":
+
 		var jobDesc []byte
 		if flagSet.Arg(1) == "" {
 			fmt.Fprintf(os.Stderr, "Reading from stdin...\n")
@@ -59,6 +63,24 @@ func run(requestor string, transport transport.Transport, stdout io.Writer) erro
 		jobDescJSON, err := config.ParseJobDescriptor(jobDesc, jobDescFormat)
 		if err != nil {
 			return fmt.Errorf("failed to parse job descriptor: %w", err)
+		}
+
+		// if the variable is set, download the binary
+		// the url is presumed to be from a
+		// trusted domain
+		unparsedURL, set := os.LookupEnv(env.EnvBinUrl)
+		if set == true || unparsedURL != "" {
+
+			binaryPath, err := download.DownloadBinary(unparsedURL)
+			if err != nil {
+				return err
+			}
+
+			jobDescJSON, err = addBinPathToTest(jobDescJSON, binaryPath)
+			if err != nil {
+				return err
+			}
+
 		}
 
 		startResp, err := transport.Start(context.Background(), requestor, string(jobDescJSON))
@@ -214,4 +236,21 @@ func parseJob(jobIDStr string) (types.JobID, error) {
 		return 0, fmt.Errorf("Invalid job ID: %s: it must be positive", jobIDStr)
 	}
 	return jobID, nil
+}
+
+func addBinPathToTest(testDescr []byte, binaryPath string) ([]byte, error) {
+	s := struct{ Filename string }{binaryPath}
+
+	t, err := template.New("insertbinary").Delims("[[", "]]").Parse(string(testDescr))
+	if err != nil {
+		return nil, err
+	}
+
+	returnBuffer := bytes.Buffer{}
+
+	if err := t.Execute(&returnBuffer, s); err != nil {
+		return nil, err
+	}
+
+	return returnBuffer.Bytes(), nil
 }
