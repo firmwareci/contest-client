@@ -8,7 +8,12 @@ require (
 )
 
 require (
-	github.com/google/uuid v1.3.0 // indirect
-	github.com/insomniacslk/xjson v0.0.0-20210106140854-1589ccfd1a1a // indirect
-	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
+	github.com/aws/aws-sdk-go-v2 v1.16.3
+	github.com/aws/aws-sdk-go-v2/config v1.15.4
+	github.com/aws/aws-sdk-go-v2/credentials v1.12.0
+	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.11.8
+	github.com/aws/aws-sdk-go-v2/service/s3 v1.26.8
+	github.com/jlaffaye/ftp v0.0.0-20220310202011-d2c44e311e78
+	github.com/pkg/sftp v1.13.4
+	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519
 )
