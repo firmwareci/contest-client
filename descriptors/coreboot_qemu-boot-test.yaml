@@ -1,0 +1,43 @@
+JobName: QEMU Boot Test
+Runs: 1
+RunInterval: 60s
+Tags: ["coreboot", "qemu", "boot"]
+TestDescriptors:
+    -   TargetManagerName: TargetList
+        TargetManagerAcquireParameters:
+            FileURI: hosts.csv
+            Shuffle: true
+            MinNumberDevices: 1
+            MaxNumberDevices: 1
+        TargetManagerReleaseParameters:
+        TestFetcherName: literal
+        TestFetcherFetchParameters:
+            TestName: Build and Boot coreboot
+            Steps:
+                -   name: cmd
+                    label: Cloning all assets
+                    parameters:
+                        executable: [git]
+                        args: ["clone","https://github.com/9elements/contest-job-assets.git", "/tmp/assets-spr-sp-{{ .ID }}/"]
+                        expect: ["Cloning into"]
+
+                -   name: cmd
+                    label: qemu script into folder
+                    parameters:
+                        executable: [cp]
+                        args: ["/tmp/assets-spr-sp-{{ .ID }}/qemuscript.sh", "qemuscript.sh"]
+                        dir: ["/tmp/coreboot-spr-sp-{{ .ID }}/"]
+
+                -   name: cmd
+                    label: emulate coreboot
+                    parameters:
+                        executable: [sh]
+                        args: ["qemuscript.sh"]
+                        dir: ["/tmp/coreboot-spr-sp-{{ .ID }}/"]   
+                        expect: ["Jumping to boot code"]
+
+Reporting:
+    RunReporters:
+        -   name: TargetSuccess
+            parameters:
+                SuccessExpression: "=100%"
