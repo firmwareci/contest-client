@@ -26,9 +26,9 @@ TestDescriptors:
                     label: emulate coreboot
                     parameters:
                         executable: [sh]
-                        args: ["qemuscript.sh"]
+                        args: ["qemuscript100.sh"]
                         dir: ["/tmp/assets{{ .ID }}/"]   
-                        expect: ["Boot test successful."]
+                        expect: ["All tests successful."]
 
 Reporting:
     RunReporters:
