@@ -18,22 +18,15 @@ TestDescriptors:
                     label: Cloning all assets
                     parameters:
                         executable: [git]
-                        args: ["clone","https://github.com/9elements/contest-job-assets.git", "/tmp/assets-spr-sp-{{ .ID }}/"]
+                        args: ["clone","https://github.com/9elements/contest-job-assets.git", "/tmp/assets{{ .ID }}/"]
                         expect: ["Cloning into"]
-
-                -   name: cmd
-                    label: qemu script into folder
-                    parameters:
-                        executable: [cp]
-                        args: ["/tmp/assets-spr-sp-{{ .ID }}/qemuscript.sh", "qemuscript.sh"]
-                        dir: ["/tmp/coreboot-spr-sp-{{ .ID }}/"]
 
                 -   name: cmd
                     label: emulate coreboot
                     parameters:
                         executable: [sh]
                         args: ["qemuscript.sh"]
-                        dir: ["/tmp/coreboot-spr-sp-{{ .ID }}/"]   
+                        dir: ["/tmp/assets{{ .ID }}/"]   
                         expect: ["Jumping to boot code"]
 
 Reporting:
