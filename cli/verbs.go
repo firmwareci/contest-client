@@ -15,6 +15,7 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -126,16 +127,20 @@ func run(requestor string, transport transport.Transport, stdout io.Writer) erro
 				filename = env.DefaultLogFile
 			}
 
-			// Create the Logfile
-			jobLog, err := os.Create(filename)
-			defer jobLog.Close()
-
+			dir, _ := filepath.Split(filename)
+			_, err = os.Stat(dir)
 			if err != nil {
-				return fmt.Errorf("Could not Create job Log file: %w", err)
+				if errors.Is(err, os.ErrNotExist) {
+					if err := os.MkdirAll(dir, 0770); err != nil {
+						return fmt.Errorf("path to store the logs does not exist, error while creating it: %v", err)
+					}
+				} else {
+					return fmt.Errorf("error retrieving logfile path stat: %v", err)
+				}
 			}
 
-			// Write the Log.
-			if _, err := jobLog.WriteString(buffer.String()); err != nil {
+			// Write the Logfile
+			if err := os.WriteFile(filename, buffer.Bytes(), 0770); err != nil {
 				return fmt.Errorf("Could not write to job Log file: %w", err)
 			}
 		}
