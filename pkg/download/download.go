@@ -39,7 +39,11 @@ func DownloadBinary(unparsedURL string) (string, error) {
 		binaryDirectory = env.DefaultBinaryDir
 	}
 
-	dir, _ := filepath.Split(binaryDirectory)
+	dir, filepath := filepath.Split(binaryDirectory)
+	if filepath != "" {
+		return "", fmt.Errorf("binary directory is not a directory")
+	}
+
 	_, err = os.Stat(dir)
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
