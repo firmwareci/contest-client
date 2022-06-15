@@ -41,7 +41,7 @@ func DownloadBinary(unparsedURL string) (string, error) {
 
 	dir, filepath := filepath.Split(binaryDirectory)
 	if filepath != "" {
-		return "", fmt.Errorf("binary directory is not a directory")
+		return "", fmt.Errorf("supplied download directory is not a valid directory path, it seems like a /path/to/file")
 	}
 
 	_, err = os.Stat(dir)
