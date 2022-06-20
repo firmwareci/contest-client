@@ -244,7 +244,7 @@ func parseJob(jobIDStr string) (types.JobID, error) {
 }
 
 func addBinPathToTest(testDescr []byte, binaryPath string) ([]byte, error) {
-	s := struct{ Filename string }{binaryPath}
+	s := struct{ BinaryPath string }{binaryPath}
 
 	t, err := template.New("insertbinary").Delims("[[", "]]").Parse(string(testDescr))
 	if err != nil {

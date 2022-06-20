@@ -1,0 +1,48 @@
+JobName: Qemu Boot CentOS 
+Runs: 1
+RunInterval: 60s
+TestDescriptors:
+    -   TargetManagerName: TargetList
+        TargetManagerAcquireParameters:
+          Targets:
+              - ID: "0000"
+          MinNumberDevices: 1
+          MaxNumberDevices: 1
+        TargetManagerReleaseParameters:
+        TestFetcherName: literal
+        TestFetcherFetchParameters:
+            TestName: Boot CentOS coreboot
+            Steps:
+                - name:cmd
+                  label: Make Logfile
+                  parameters:
+                    executable: [sh]
+                    args: ["touch",
+                        "/tmp/Ubuntu20.04-boot.log",
+                    ]
+
+                - name: cmd
+                  label: Qemu boot CentOS
+                  parameters:
+                    executable: [sh]
+                    args: ["qemu-system-x86_64",
+                        "-bios [[ .BinaryPath ]]",
+                        "-M pc-i440fx-2.7",
+                        "-m 8000",
+                        "-smp 6",
+                        "/root/assets/images/Ubuntu20.04.qcow2"
+                        "-nographic -serial pipe:Ubuntu20.04-boot.log",
+                    ]
+                    dir: ["/tmp/"]
+                        
+                - name: cmd
+                  label: Grep Keywords
+                  parameters:
+                    executable: [sh]
+                    args: ["-a  -a -E 'CentOS Linux 7|X.Org X Server 1.20.4' ./Centos7-boot.log"]
+                    expect: "CentOS Linux 7|X Org X Server 1.20.4"
+Reporting:
+    RunReporters:
+        -   name: TargetSuccess
+            parameters:
+                SuccessExpression: "=100%"
