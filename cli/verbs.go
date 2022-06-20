@@ -74,8 +74,9 @@ func run(requestor string, transport transport.Transport, stdout io.Writer) erro
 
 			binaryPath, err := download.DownloadBinary(unparsedURL)
 			if err != nil {
-				return err
+				return fmt.Errorf("Error in Download: %v", err)
 			}
+			fmt.Printf("%v%v", binaryPath, err)
 
 			jobDescJSON, err = addBinPathToTest(jobDescJSON, binaryPath)
 			if err != nil {
@@ -131,7 +132,7 @@ func run(requestor string, transport transport.Transport, stdout io.Writer) erro
 			_, err = os.Stat(dir)
 			if err != nil {
 				if errors.Is(err, os.ErrNotExist) {
-					if err := os.MkdirAll(dir, 0770); err != nil {
+					if err := os.MkdirAll(dir, 0o770); err != nil {
 						return fmt.Errorf("path to store the logs does not exist, error while creating it: %v", err)
 					}
 				} else {
@@ -140,7 +141,7 @@ func run(requestor string, transport transport.Transport, stdout io.Writer) erro
 			}
 
 			// Write the Logfile
-			if err := os.WriteFile(filename, buffer.Bytes(), 0770); err != nil {
+			if err := os.WriteFile(filename, buffer.Bytes(), 0o770); err != nil {
 				return fmt.Errorf("Could not write to job Log file: %w", err)
 			}
 		}
@@ -244,7 +245,7 @@ func parseJob(jobIDStr string) (types.JobID, error) {
 }
 
 func addBinPathToTest(testDescr []byte, binaryPath string) ([]byte, error) {
-	s := struct{ Filename string }{binaryPath}
+	s := struct{ BinaryPath string }{binaryPath}
 
 	t, err := template.New("insertbinary").Delims("[[", "]]").Parse(string(testDescr))
 	if err != nil {
