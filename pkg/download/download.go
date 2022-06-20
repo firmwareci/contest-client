@@ -47,7 +47,7 @@ func DownloadBinary(unparsedURL string) (string, error) {
 	_, err = os.Stat(dir)
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
-			if err := os.MkdirAll(dir, 0770); err != nil {
+			if err := os.MkdirAll(dir, 0o770); err != nil {
 				return "", fmt.Errorf("path to download the binary does not exist, error while creating it: %v", err)
 			}
 		} else {
@@ -56,6 +56,7 @@ func DownloadBinary(unparsedURL string) (string, error) {
 	}
 
 	binaryPath := path.Join(binaryDirectory, filename)
+	fmt.Printf("Binary Path: %v", binaryPath)
 
 	file, err := os.Create(binaryPath)
 	if err != nil {

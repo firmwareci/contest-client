@@ -1,0 +1,28 @@
+
+JobName: Three simple Tests
+Runs: 3
+RunInterval: 1s
+Tags: ["simple"]
+TestDescriptors:
+    -   TargetManagerName: TargetList
+        TargetManagerAcquireParameters:
+          Targets:
+              - ID: "1234"
+          MinNumberDevices: 1
+          MaxNumberDevices: 1
+        TargetManagerReleaseParameters:
+        TestFetcherName: literal
+        TestFetcherFetchParameters:
+            TestName: Simple Test
+            Steps:
+                -   name: cmd
+                    label: Simple Command
+                    parameters:
+                        executable: [echo]
+                        args: ["This is a very simple test! The ID is {{.ID}}"]
+
+Reporting:
+    RunReporters:
+        -   name: TargetSuccess
+            parameters:
+                SuccessExpression: "=100%"
