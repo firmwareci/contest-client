@@ -9,6 +9,7 @@ import (
 	"net/url"
 	"os"
 	"path"
+	"path/filepath"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/config"
@@ -36,6 +37,22 @@ func DownloadBinary(unparsedURL string) (string, error) {
 		}
 	} else {
 		binaryDirectory = env.DefaultBinaryDir
+	}
+
+	dir, filepath := filepath.Split(binaryDirectory)
+	if filepath != "" {
+		return "", fmt.Errorf("supplied download directory is not a valid directory path, it seems like a /path/to/file")
+	}
+
+	_, err = os.Stat(dir)
+	if err != nil {
+		if errors.Is(err, os.ErrNotExist) {
+			if err := os.MkdirAll(dir, 0770); err != nil {
+				return "", fmt.Errorf("path to download the binary does not exist, error while creating it: %v", err)
+			}
+		} else {
+			return "", fmt.Errorf("error retrieving binary path stats: %v", err)
+		}
 	}
 
 	binaryPath := path.Join(binaryDirectory, filename)
