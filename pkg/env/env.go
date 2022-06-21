@@ -11,5 +11,5 @@ const (
 	EnvS3Access      = "FIRMWARECI_S3_ACCESS"
 	EnvS3Secret      = "FIRMWARECI_S3_SECRET"
 	EnvS3Region      = "FIRMWARECI_S3_REGION"
-	FirmwareciSSHKey = "/root/.ssh/firmwareci.pub"
+	FirmwareciSSHKey = "/root/.ssh/firmwareci"
 )
