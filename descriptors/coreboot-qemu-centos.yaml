@@ -23,6 +23,7 @@ TestDescriptors:
                 parameters:
                   executable: [grep]
                   args: ["-a", "-E", "CentOS|X Server", "/tmp/boot.log"]
+                  expect: ["CentOS|X Server"]
 
 Reporting:
     RunReporters:
