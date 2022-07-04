@@ -1,0 +1,42 @@
+JobName: Qemu Boot CentOS 
+Runs: 1
+RunInterval: 60s
+TestDescriptors:
+    -   TargetManagerName: TargetList
+        TargetManagerAcquireParameters:
+          Targets:
+              - ID: "1234"
+          MinNumberDevices: 1
+          MaxNumberDevices: 1
+        TargetManagerReleaseParameters:
+        TestFetcherName: literal
+        TestFetcherFetchParameters:
+            TestName: Boot CentOS coreboot
+            Steps:
+                -   name: cmd
+                    label: one
+                    parameters:
+                        executable: [sh]
+                        args: ["-c", "./dutctl -s penguin.lab.9e.network power off"]
+                        dir: ["/root/assests/fti/cmd/dutctl/"]
+                        expect: ["Command finished: [power off]"]
+                -   name: cmd
+                    label: two
+                    parameters:
+                        executable: [sh]
+                        args: ["-c", "./dutctl -s penguin.lab.9e.network power on"]
+                        dir: ["/root/assests/fti/cmd/dutctl/"]
+                        expect: ["Command finished: [power on]"]
+                -   name: cmd
+                    label: three
+                    parameters:
+                        executable: [sh]
+                        args: ["-c", "./dutctl -s penguin.lab.9e.network power off"]
+                        dir: ["/root/assests/fti/cmd/dutctl/"]
+                        expect: ["Command finished: [power off]"]
+
+Reporting:
+    RunReporters:
+        -   name: TargetSuccess
+            parameters:
+                SuccessExpression: "=100%"
