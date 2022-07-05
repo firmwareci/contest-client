@@ -23,11 +23,11 @@ import (
 	"github.com/firmwareci/contest-client/pkg/download"
 	"github.com/firmwareci/contest-client/pkg/env"
 
+	"github.com/firmwareci/contest-client/pkg/transport"
 	"github.com/linuxboot/contest/pkg/api"
 	"github.com/linuxboot/contest/pkg/config"
 	"github.com/linuxboot/contest/pkg/event"
 	"github.com/linuxboot/contest/pkg/job"
-	"github.com/linuxboot/contest/pkg/transport"
 	"github.com/linuxboot/contest/pkg/types"
 )
 
@@ -209,6 +209,10 @@ func wait(ctx context.Context, jobID types.JobID, jobWaitPoll time.Duration, req
 	// keep polling for status till job is completed, used when -wait is set
 	for {
 		resp, err := transport.Status(context.Background(), requestor, jobID)
+		if errors.Is(err, io.EOF) {
+			fmt.Fprintf(os.Stderr, "Encounterd EOF, trying again")
+			continue
+		}
 		if err != nil {
 			return nil, err
 		}
