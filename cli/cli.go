@@ -17,7 +17,7 @@ import (
 
 const (
 	defaultRequestor = "contestcli-http"
-	jobWaitPoll      = 10 * time.Second
+	jobWaitPoll      = 30 * time.Second
 )
 
 var (
