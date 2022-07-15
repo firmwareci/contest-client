@@ -1,7 +1,7 @@
 #!/bin/bash
 
 COREBOOT_BINARY="build/coreboot.rom"
-TIMEOUT="500"
+TIMEOUT="200"
 LOGFILE="boot.log"
 
 if [ ! -z $1 ]; then
@@ -18,7 +18,7 @@ fi
 
 touch $LOGFILE
 
-qemu-system-x86_64 -bios $COREBOOT_BINARY -m 8000 -smp 6 $IMAGE  -nographic -serial pipe:$LOGFILE &
+qemu-system-x86_64 -bios $COREBOOT_BINARY -m 8000 -smp 3 $IMAGE  -nographic -serial pipe:$LOGFILE &
 
 PID=$!
 sleep $TIMEOUT

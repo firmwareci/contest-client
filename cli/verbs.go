@@ -70,7 +70,7 @@ func run(requestor string, transport transport.Transport, stdout io.Writer) erro
 		// the url is presumed to be from a
 		// trusted domain
 		unparsedURL, set := os.LookupEnv(env.EnvBinUrl)
-		if set == true || unparsedURL != "" {
+		if set == true && unparsedURL != "" {
 
 			binaryPath, err := download.DownloadBinary(unparsedURL)
 			if err != nil {
@@ -132,7 +132,7 @@ func run(requestor string, transport transport.Transport, stdout io.Writer) erro
 			_, err = os.Stat(dir)
 			if err != nil {
 				if errors.Is(err, os.ErrNotExist) {
-					if err := os.MkdirAll(dir, 0o770); err != nil {
+					if err := os.MkdirAll(dir, os.ModePerm); err != nil {
 						return fmt.Errorf("path to store the logs does not exist, error while creating it: %v", err)
 					}
 				} else {
@@ -141,7 +141,7 @@ func run(requestor string, transport transport.Transport, stdout io.Writer) erro
 			}
 
 			// Write the Logfile
-			if err := os.WriteFile(filename, buffer.Bytes(), 0o770); err != nil {
+			if err := os.WriteFile(filename, buffer.Bytes(), os.ModePerm); err != nil {
 				return fmt.Errorf("Could not write to job Log file: %w", err)
 			}
 		}
@@ -207,6 +207,7 @@ func run(requestor string, transport transport.Transport, stdout io.Writer) erro
 
 func wait(ctx context.Context, jobID types.JobID, jobWaitPoll time.Duration, requestor string, transport transport.Transport) (*api.StatusResponse, error) {
 	// keep polling for status till job is completed, used when -wait is set
+	errorsReturned := 0
 	for {
 		resp, err := transport.Status(context.Background(), requestor, jobID)
 		if errors.Is(err, io.EOF) {
@@ -214,7 +215,13 @@ func wait(ctx context.Context, jobID types.JobID, jobWaitPoll time.Duration, req
 			continue
 		}
 		if err != nil {
-			return nil, err
+			errorsReturned += 1
+			fmt.Fprintf(os.Stderr, "Encountered error, while waiting for job: %v. Retrying...", err)
+
+			if errorsReturned > 3 {
+				fmt.Fprintf(os.Stderr, "Encountered too many errors, while waiting for Job")
+				return nil, err
+			}
 		}
 		if resp.Err != nil {
 			return nil, fmt.Errorf("server responded with an error: %s", resp.Err)

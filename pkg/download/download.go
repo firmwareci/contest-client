@@ -48,7 +48,7 @@ func DownloadBinary(unparsedURL string) (string, error) {
 	_, err = os.Stat(dir)
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
-			if err := os.MkdirAll(dir, 0o770); err != nil {
+			if err := os.MkdirAll(dir, os.ModePerm); err != nil {
 				return "", fmt.Errorf("path to download the binary does not exist, error while creating it: %v", err)
 			}
 		} else {
@@ -148,12 +148,12 @@ func downloadSFTP(file *os.File, URL *url.URL) error {
 		return errors.New("No User Account or password provided")
 	}
 
-	keyFile, err := os.Open(env.FirmwareciSSHPublicKey)
+	keyFile, err := os.Open(env.FirmwareciSSHKey)
 	if err != nil {
 		return err
 	}
 
-	privateKey, err := io.ReadAll(keyFile)
+	sshKey, err := io.ReadAll(keyFile)
 	if err != nil {
 		return err
 	}
@@ -161,9 +161,9 @@ func downloadSFTP(file *os.File, URL *url.URL) error {
 	var Signer ssh.Signer
 
 	if sshPW, set := os.LookupEnv(env.EnvSSHPrivatePW); set == false || sshPW != "" {
-		Signer, err = ssh.ParsePrivateKeyWithPassphrase(privateKey, []byte(sshPW))
+		Signer, err = ssh.ParsePrivateKeyWithPassphrase(sshKey, []byte(sshPW))
 	} else {
-		Signer, err = ssh.ParsePrivateKey(privateKey)
+		Signer, err = ssh.ParsePrivateKey(sshKey)
 	}
 
 	if err != nil {
