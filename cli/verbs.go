@@ -23,11 +23,11 @@ import (
 	"github.com/firmwareci/contest-client/pkg/download"
 	"github.com/firmwareci/contest-client/pkg/env"
 
+	"github.com/firmwareci/contest-client/pkg/transport"
 	"github.com/linuxboot/contest/pkg/api"
 	"github.com/linuxboot/contest/pkg/config"
 	"github.com/linuxboot/contest/pkg/event"
 	"github.com/linuxboot/contest/pkg/job"
-	"github.com/linuxboot/contest/pkg/transport"
 	"github.com/linuxboot/contest/pkg/types"
 )
 
@@ -70,12 +70,13 @@ func run(requestor string, transport transport.Transport, stdout io.Writer) erro
 		// the url is presumed to be from a
 		// trusted domain
 		unparsedURL, set := os.LookupEnv(env.EnvBinUrl)
-		if set == true || unparsedURL != "" {
+		if set == true && unparsedURL != "" {
 
 			binaryPath, err := download.DownloadBinary(unparsedURL)
 			if err != nil {
-				return err
+				return fmt.Errorf("Error in Download: %v", err)
 			}
+			fmt.Printf("%v%v", binaryPath, err)
 
 			jobDescJSON, err = addBinPathToTest(jobDescJSON, binaryPath)
 			if err != nil {
@@ -131,7 +132,7 @@ func run(requestor string, transport transport.Transport, stdout io.Writer) erro
 			_, err = os.Stat(dir)
 			if err != nil {
 				if errors.Is(err, os.ErrNotExist) {
-					if err := os.MkdirAll(dir, 0770); err != nil {
+					if err := os.MkdirAll(dir, os.ModePerm); err != nil {
 						return fmt.Errorf("path to store the logs does not exist, error while creating it: %v", err)
 					}
 				} else {
@@ -140,7 +141,7 @@ func run(requestor string, transport transport.Transport, stdout io.Writer) erro
 			}
 
 			// Write the Logfile
-			if err := os.WriteFile(filename, buffer.Bytes(), 0770); err != nil {
+			if err := os.WriteFile(filename, buffer.Bytes(), os.ModePerm); err != nil {
 				return fmt.Errorf("Could not write to job Log file: %w", err)
 			}
 		}
@@ -206,10 +207,21 @@ func run(requestor string, transport transport.Transport, stdout io.Writer) erro
 
 func wait(ctx context.Context, jobID types.JobID, jobWaitPoll time.Duration, requestor string, transport transport.Transport) (*api.StatusResponse, error) {
 	// keep polling for status till job is completed, used when -wait is set
+	errorsReturned := 0
 	for {
 		resp, err := transport.Status(context.Background(), requestor, jobID)
+		if errors.Is(err, io.EOF) {
+			fmt.Fprintf(os.Stderr, "Encounterd EOF, trying again")
+			continue
+		}
 		if err != nil {
-			return nil, err
+			errorsReturned += 1
+			fmt.Fprintf(os.Stderr, "Encountered error, while waiting for job: %v. Retrying...", err)
+
+			if errorsReturned > 3 {
+				fmt.Fprintf(os.Stderr, "Encountered too many errors, while waiting for Job")
+				return nil, err
+			}
 		}
 		if resp.Err != nil {
 			return nil, fmt.Errorf("server responded with an error: %s", resp.Err)
@@ -244,7 +256,7 @@ func parseJob(jobIDStr string) (types.JobID, error) {
 }
 
 func addBinPathToTest(testDescr []byte, binaryPath string) ([]byte, error) {
-	s := struct{ Filename string }{binaryPath}
+	s := struct{ BinaryPath string }{binaryPath}
 
 	t, err := template.New("insertbinary").Delims("[[", "]]").Parse(string(testDescr))
 	if err != nil {

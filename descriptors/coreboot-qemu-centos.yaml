@@ -1,0 +1,31 @@
+JobName: Qemu Boot CentOS 
+Runs: 1
+RunInterval: 60s
+TestDescriptors:
+    -   TargetManagerName: TargetList
+        TargetManagerAcquireParameters:
+          Targets:
+              - ID: "0000"
+          MinNumberDevices: 1
+          MaxNumberDevices: 1
+        TargetManagerReleaseParameters:
+        TestFetcherName: literal
+        TestFetcherFetchParameters:
+            TestName: Boot CentOS coreboot
+            Steps:
+              - name: cmd
+                label: Qemu boot CentOS
+                parameters:
+                  executable: [qemu_testboot.sh]
+                  args: ["[[ .BinaryPath ]] ", "/root/images/Centos7.qcow2", "/tmp/boot.log"]
+              - name: cmd
+                label: Grep for desired keywords
+                parameters:
+                  executable: [grep]
+                  args: ["-a", "-E", "CentOS|X Server", "/tmp/boot.log"]
+
+Reporting:
+    RunReporters:
+        -   name: TargetSuccess
+            parameters:
+                SuccessExpression: "=100%"
