@@ -1,6 +1,7 @@
 JobName: Qemu Boot Ubuntu 
 Runs: 1
 RunInterval: 60s
+Version: "1.0"
 Testdescriptors:
     -   TargetManagerName: TargetList
         TargetManagerAcquireParameters:

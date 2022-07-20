@@ -1,6 +1,7 @@
 JobName: Qemu Boot CentOS 
 Runs: 1
 RunInterval: 60s
+Version: "1.0"
 TestDescriptors:
     -   TargetManagerName: TargetList
         TargetManagerAcquireParameters:

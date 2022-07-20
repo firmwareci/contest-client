@@ -1,0 +1,52 @@
+
+JobName: Dutctl test
+Runs: 1
+RunInterval: 60s
+Version: "1.0"
+TestDescriptors:
+    -   TargetManagerName: TargetList
+        TargetManagerAcquireParameters:
+          Targets:
+              - ID: "1234"
+          MinNumberDevices: 1
+          MaxNumberDevices: 1
+        TargetManagerReleaseParameters:
+        TestFetcherName: literal
+        TestFetcherFetchParameters:
+            TestName: Simple Test
+            Steps:
+                -   name: dutctl
+                    label: power off1
+                    parameters:
+                        serverAddr: ["penguin.lab.9e.network"]
+                        command: ["power"]
+                        args: ["off"]
+
+                -   name: dutctl
+                    label: flash 
+                    parameters:
+                        serverAddr: ["penguin.lab.9e.network"]
+                        command: ["flash"]
+                        args: ["write", "[[ .BinaryPath ]]"]
+
+                -   name: dutctl
+                    label: power on
+                    parameters:
+                        serverAddr: ["penguin.lab.9e.network"]
+                        command: ["power"]
+                        args: ["on"]
+                        expect: ["Welcome to u-root!"]
+                        timeout: [1m]
+
+                -   name: dutctl
+                    label: power off2
+                    parameters:
+                        serverAddr: ["penguin.lab.9e.network"]
+                        command: ["power"]
+                        args: ["off"]
+
+Reporting:
+    RunReporters:
+        -   name: TargetSuccess
+            parameters:
+                SuccessExpression: "=100%"

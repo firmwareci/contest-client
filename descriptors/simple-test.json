@@ -2,6 +2,7 @@
     "JobName": "test job",
     "Runs": 3,
     "RunInterval": "3s",
+    "Version": "1.0",
     "Tags": [
         "test",
         "csv"
