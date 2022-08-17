@@ -2,11 +2,11 @@ JobName: Qemu Boot CentOS
 Runs: 1
 RunInterval: 60s
 Version: "1.0"
-TestDescriptors:
+Testdescriptors:
     -   TargetManagerName: TargetList
         TargetManagerAcquireParameters:
           Targets:
-              - ID: "0000"
+              - ID: "x86_64"
           MinNumberDevices: 1
           MaxNumberDevices: 1
         TargetManagerReleaseParameters:
@@ -14,19 +14,34 @@ TestDescriptors:
         TestFetcherFetchParameters:
             TestName: Boot CentOS coreboot
             Steps:
-              - name: cmd
-                label: Qemu boot CentOS
+              - name: qemu
+                label: qbt 
                 parameters:
-                  executable: [qemu_testboot.sh]
-                  args: ["[[ .BinaryPath ]] ", "/root/images/Centos7.qcow2", "/tmp/boot.log"]
-              - name: cmd
-                label: Grep for desired keywords
-                parameters:
-                  executable: [grep]
-                  args: ["-a", "-E", "CentOS|X Server", "/tmp/boot.log"]
-
+                  executable: ['qemu-system-{{.ID}}']
+                  firmware: ['[[ .BinaryPath ]]']
+                  image: ['/root/images/Centos7.qcow2']
+                  logfile: ['/logs/bootlog']
+                  nproc: [4]
+                  mem: [8000]
+                  timeout: [6m]
+                  steps:
+                    - expect: 'Jumping to boot code at 0x[0-9, a-f]{8}\(0x[0-9, a-f]{8}\)'
+                      timeout: 6s
+                    - expect: '\nCentOS Linux 7 \(Core\)'
+                    - expect: login
+                      send: user
+                    - expect: Password
+                      timeout: 15s
+                      send: 9elements.com
+                    - expect: user@
+                      timeout: 15s
+                      send: sudo systemctl poweroff
+                    - expect: '\[sudo\] password for user:'
+                      timeout: 15s
+                    - send: 9elements.com
+                    - expect: Power down
 Reporting:
     RunReporters:
-        -   name: TargetSuccess
-            parameters:
-                SuccessExpression: "=100%"
+        - name: TargetSuccess
+          parameters:
+              SuccessExpression: "=100%"
