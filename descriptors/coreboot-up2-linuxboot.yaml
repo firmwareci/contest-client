@@ -18,21 +18,21 @@ TestDescriptors:
                 -   name: dutctl
                     label: power off1
                     parameters:
-                        serverAddr: ["penguin.lab.9e.network"]
+                        serverAddr: ["penguin"]
                         command: ["power"]
                         args: ["off"]
 
                 -   name: dutctl
                     label: flash 
                     parameters:
-                        serverAddr: ["penguin.lab.9e.network"]
+                        serverAddr: ["penguin"]
                         command: ["flash"]
                         args: ["write", "[[ .BinaryPath ]]"]
 
                 -   name: dutctl
                     label: power on
                     parameters:
-                        serverAddr: ["penguin.lab.9e.network"]
+                        serverAddr: ["penguin"]
                         command: ["power"]
                         args: ["on"]
                         expect: ["Welcome to u-root!"]
@@ -41,7 +41,7 @@ TestDescriptors:
                 -   name: dutctl
                     label: power off2
                     parameters:
-                        serverAddr: ["penguin.lab.9e.network"]
+                        serverAddr: ["penguin"]
                         command: ["power"]
                         args: ["off"]
 
