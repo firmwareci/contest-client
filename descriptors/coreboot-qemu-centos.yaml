@@ -19,7 +19,7 @@ Testdescriptors:
                 parameters:
                   executable: ['qemu-system-{{.ID}}']
                   firmware: ['[[ .BinaryPath ]]']
-                  image: ['/root/images/Centos7.qcow2']
+                  image: ['/home/firmwareci/images/Centos7.qcow2']
                   logfile: ['/logs/bootlog']
                   nproc: [4]
                   mem: [8000]

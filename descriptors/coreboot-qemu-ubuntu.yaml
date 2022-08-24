@@ -19,7 +19,7 @@ Testdescriptors:
                 parameters:
                   executable: ['qemu-system-{{.ID}}']
                   firmware: ['[[ .BinaryPath ]]']
-                  image: ['/root/images/Ubuntu20.04.qcow2']
+                  image: ['/home/firmwareci/images/Ubuntu20.04.qcow2']
                   logfile: ['/logs/bootlog']
                   nproc: [4]
                   mem: [8000]
