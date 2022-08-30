@@ -10,6 +10,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/config"
@@ -79,7 +80,7 @@ func DownloadBinary(unparsedURL string) (string, error) {
 		if err := downloadSFTP(file, URL); err != nil {
 			return "", err
 		}
-	case "S3":
+	case "s3":
 		if err := downloadS3(file, URL); err != nil {
 			return "", err
 		}
@@ -242,11 +243,11 @@ func downloadS3(file *os.File, URL *url.URL) error {
 	S3client := s3.NewFromConfig(cfg)
 
 	Bucket := &URL.Host
-	Key := &URL.Path
+	Key := strings.TrimPrefix(URL.Path, "/")
 
 	out, err := S3client.GetObject(ctx, &s3.GetObjectInput{
 		Bucket: Bucket,
-		Key:    Key,
+		Key:    &Key,
 	})
 	if err != nil {
 		return err
