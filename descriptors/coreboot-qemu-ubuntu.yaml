@@ -12,10 +12,10 @@ Testdescriptors:
         TargetManagerReleaseParameters:
         TestFetcherName: literal
         TestFetcherFetchParameters:
-            TestName: Coreboot Boot Ubuntu
+            TestName: Boot Ubuntu coreboot 
             Steps:
               - name: qemu
-                label: qbt
+                label: Qemu boot test.
                 parameters:
                   executable: ['qemu-system-{{.ID}}']
                   firmware: ['[[ .BinaryPath ]]']
