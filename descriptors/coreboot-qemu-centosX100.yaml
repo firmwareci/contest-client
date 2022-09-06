@@ -1,0 +1,47 @@
+JobName: Qemu Boot CentOS 
+Runs: 100
+RunInterval: 60s
+Version: "1.0"
+Testdescriptors:
+    -   TargetManagerName: TargetList
+        TargetManagerAcquireParameters:
+          Targets:
+              - ID: "x86_64"
+          MinNumberDevices: 1
+          MaxNumberDevices: 1
+        TargetManagerReleaseParameters:
+        TestFetcherName: literal
+        TestFetcherFetchParameters:
+            TestName: Boot CentOS coreboot
+            Steps:
+              - name: qemu
+                label: Qemu boot test. 
+                parameters:
+                  executable: ['qemu-system-{{.ID}}']
+                  firmware: ['[[ .BinaryPath ]]']
+                  image: ['/root/images/Centos7.qcow2']
+                  logfile: ['/logs/bootlog']
+                  nproc: [4]
+                  mem: [8000]
+                  timeout: [6m]
+                  steps:
+                    - expect: 'Jumping to boot code at 0x[0-9, a-f]{8}\(0x[0-9, a-f]{8}\)'
+                      timeout: 6s
+                    - expect: '\nCentOS Linux 7 \(Core\)'
+                    - expect: login
+                      send: user
+                    - expect: Password
+                      timeout: 15s
+                      send: 9elements.com
+                    - expect: user@
+                      timeout: 15s
+                      send: sudo systemctl poweroff
+                    - expect: '\[sudo\] password for user:'
+                      timeout: 15s
+                    - send: 9elements.com
+                    - expect: Power down
+Reporting:
+    RunReporters:
+        - name: TargetSuccess
+          parameters:
+              SuccessExpression: "=100%"
