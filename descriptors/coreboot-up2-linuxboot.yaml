@@ -16,21 +16,21 @@ TestDescriptors:
             TestName: Simple Test
             Steps:
                 -   name: dutctl
-                    label: power off1
+                    label: Prepare the flash step. Shutdown the device.
                     parameters:
                         serverAddr: ["penguin"]
                         command: ["power"]
                         args: ["off"]
 
                 -   name: dutctl
-                    label: flash 
+                    label: Flash the given binary. 
                     parameters:
                         serverAddr: ["penguin"]
                         command: ["flash"]
                         args: ["write", "[[ .BinaryPath ]]"]
 
                 -   name: dutctl
-                    label: power on
+                    label: Power on the device to check if it boots.
                     parameters:
                         serverAddr: ["penguin"]
                         command: ["power"]
@@ -39,7 +39,7 @@ TestDescriptors:
                         timeout: [1m]
 
                 -   name: dutctl
-                    label: power off2
+                    label: Clean up. Shutdown the device.
                     parameters:
                         serverAddr: ["penguin"]
                         command: ["power"]

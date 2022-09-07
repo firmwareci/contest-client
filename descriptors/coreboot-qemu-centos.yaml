@@ -15,7 +15,7 @@ Testdescriptors:
             TestName: Boot CentOS coreboot
             Steps:
               - name: qemu
-                label: qbt 
+                label: Qemu boot test. 
                 parameters:
                   executable: ['qemu-system-{{.ID}}']
                   firmware: ['[[ .BinaryPath ]]']
