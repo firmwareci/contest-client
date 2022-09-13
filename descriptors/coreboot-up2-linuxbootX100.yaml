@@ -1,0 +1,51 @@
+JobName: Dutctl test
+Runs: 1
+RunInterval: 60s
+Version: "1.0"
+TestDescriptors:
+    -   TargetManagerName: TargetList
+        TargetManagerAcquireParameters:
+          Targets:
+              - ID: "1234"
+          MinNumberDevices: 1
+          MaxNumberDevices: 1
+        TargetManagerReleaseParameters:
+        TestFetcherName: literal
+        TestFetcherFetchParameters:
+            TestName: Simple Test
+            Steps:
+                -   name: dutctl
+                    label: Prepare the flash step. Shutdown the device.
+                    parameters:
+                        serverAddr: ["penguin"]
+                        command: ["power"]
+                        args: ["off"]
+
+                -   name: dutctl
+                    label: Flash the given binary. 
+                    parameters:
+                        serverAddr: ["penguin"]
+                        command: ["flash"]
+                        args: ["write", "[[ .BinaryPath ]]"]
+
+                -   name: dutctl
+                    label: Powercycle the device to check if it boots 100 times.
+                    parameters:
+                        serverAddr: ["penguin"]
+                        command: ["power"]
+                        args: ["powercycle", "100"]
+                        expect: ["Welcome to u-root!"]
+                        timeout: [1m]
+
+                -   name: dutctl
+                    label: Clean up. Shutdown the device.
+                    parameters:
+                        serverAddr: ["penguin"]
+                        command: ["power"]
+                        args: ["off"]
+
+Reporting:
+    RunReporters:
+        -   name: TargetSuccess
+            parameters:
+                SuccessExpression: "=100%"
