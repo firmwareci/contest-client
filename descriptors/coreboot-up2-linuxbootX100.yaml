@@ -15,7 +15,7 @@ TestDescriptors:
             TestName: Simple Test
             Steps:
                 -   name: dutctl
-                    label: Prepare the flash step. Shutdown the device.
+                    label: Shutdown the device.
                     parameters:
                         serverAddr: ["penguin"]
                         command: ["power"]
@@ -29,7 +29,7 @@ TestDescriptors:
                         args: ["write", "[[ .BinaryPath ]]"]
 
                 -   name: dutctl
-                    label: Powercycle the device to check if it boots 100 times.
+                    label: Conduct the powercycle test.
                     parameters:
                         serverAddr: ["penguin"]
                         command: ["power"]
