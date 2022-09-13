@@ -37,10 +37,10 @@ Testdescriptors:
                       timeout: 15s
                       send: lscpu 
                     - expect: '((?s)CPU\(s\):[ ]+4.*Vendor ID:[ ]+AuthenticAMD)'
-                    - send: lscpu
-                      expect: '((?s)CPU family:[ ]+15 .*Model:[ ]+107)'
-                    - send: lscpu
-                      expect: '((?s)L1d cache:[ ]+64K .*L1i cache:[ ]+64K .*L2 cache:[ ]+512K .*L3 cache:[ ]+16384K)'
+                      send: lscpu
+                    - expect: '((?s)CPU family:[ ]+15 .*Model:[ ]+107)'
+                      send: lscpu
+                    - expect: '((?s)L1d cache:[ ]+64K .*L1i cache:[ ]+64K .*L2 cache:[ ]+512K .*L3 cache:[ ]+16384K)'
 
                     - send: cat /proc/cpuinfo
                     - expect: 'microcode\s: 0x1000065'
