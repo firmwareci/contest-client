@@ -18,21 +18,21 @@ TestDescriptors:
                 -   name: dutctl
                     label: Shutdown the device.
                     parameters:
-                        serverAddr: ["penguin"]
+                        serverAddr: ["penguin.local"]
                         command: ["power"]
                         args: ["off"]
 
                 -   name: dutctl
                     label: Flash the given binary. 
                     parameters:
-                        serverAddr: ["penguin"]
+                        serverAddr: ["penguin.local"]
                         command: ["flash"]
                         args: ["write", "[[ .BinaryPath ]]"]
 
                 -   name: dutctl
                     label: Conduct the boot test.
                     parameters:
-                        serverAddr: ["penguin"]
+                        serverAddr: ["penguin.local"]
                         command: ["power"]
                         args: ["on"]
                         expect: ["Welcome to u-root!"]
@@ -41,7 +41,7 @@ TestDescriptors:
                 -   name: dutctl
                     label: Clean up. Shutdown the device.
                     parameters:
-                        serverAddr: ["penguin"]
+                        serverAddr: ["penguin.local"]
                         command: ["power"]
                         args: ["off"]
 
