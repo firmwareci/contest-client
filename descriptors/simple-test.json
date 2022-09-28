@@ -1,6 +1,6 @@
 {
     "JobName": "test job",
-    "Runs": 3,
+    "Runs": 1,
     "RunInterval": "3s",
     "Version": "1.0",
     "Tags": [

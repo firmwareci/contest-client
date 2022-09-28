@@ -18,30 +18,30 @@ TestDescriptors:
                 -   name: dutctl
                     label: Shutdown the device.
                     parameters:
-                        serverAddr: ["penguin"]
+                        serverAddr: ["10.93.130.16"]
                         command: ["power"]
                         args: ["off"]
 
                 -   name: dutctl
                     label: Flash the given binary. 
                     parameters:
-                        serverAddr: ["penguin"]
+                        serverAddr: ["10.93.130.16"]
                         command: ["flash"]
                         args: ["write", "[[ .BinaryPath ]]"]
 
                 -   name: dutctl
                     label: Conduct the boot test.
                     parameters:
-                        serverAddr: ["penguin"]
+                        serverAddr: ["10.93.130.16"]
                         command: ["power"]
                         args: ["on"]
-                        expect: ["Welcome to u-root!"]
-                        timeout: [1m]
+                        expect: ["CPU: Intel(R) Celeron(R) CPU N3350"]
+                        timeout: [2m]
 
                 -   name: dutctl
                     label: Clean up. Shutdown the device.
                     parameters:
-                        serverAddr: ["penguin"]
+                        serverAddr: ["10.93.130.16"]
                         command: ["power"]
                         args: ["off"]
 
