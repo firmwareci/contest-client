@@ -1,0 +1,86 @@
+
+JobName: Dutctl test
+Runs: 1
+RunInterval: 60s
+Version: "1.0"
+TestDescriptors:
+    -   TargetManagerName: TargetList
+        TargetManagerAcquireParameters:
+          Targets:
+              - ID: "1234"
+          MinNumberDevices: 1
+          MaxNumberDevices: 1
+        TargetManagerReleaseParameters:
+        TestFetcherName: literal
+        TestFetcherFetchParameters:
+            TestName: Simple Test
+            Steps:
+                -   name: dutctl
+                    label: Turn on device.
+                    parameters:
+                        serverAddr: ["10.93.130.16"]
+                        command: ["power"]
+                        args: ["on"]
+
+                -   name: cmd
+                    label: Flash the x11ssh-TF
+                    parameters:
+                        executable: ["/root/assets/SMCIPMITool_2.22.0_build.190701_bundleJRE_Linux_x64/SMCIPMITool"]
+                        args: ["9esec-x11ssh-bmc.lab.9e.network", "admin", "ADMIN", "bios", "update", "[[ .BinaryPath ]]",  "-FORCEREBOOT", "-f"]
+                        emit_stdout: [true]
+                        emit_stderr: [true]
+                
+                -   name: dutctl
+                    label: Turn off device.
+                    parameters:
+                        serverAddr: ["10.93.130.16"]
+                        command: ["power"]
+                        args: ["off"]
+
+                -   name: dutctl
+                    label: Boot to OS Shell
+                    parameters:
+                        serverAddr: ["10.93.130.16"]
+                        command: ["power"]
+                        args: ["on"]
+                        expect: ["x11ssh login:"]
+                        timeout: [5m]
+
+                -   name: dutctl
+                    label: Login - username
+                    parameters:
+                        serverAddr: ["10.93.130.16"]
+                        command: ["serial"]
+                        expect: ["Password"]
+                        in: ["oscar"]
+                        timeout: [1m]
+                
+                -   name: dutctl
+                    label: Login - Password
+                    parameters:
+                        serverAddr: ["10.93.130.16"]
+                        command: ["serial"]
+                        expect: ["Last login:"]
+                        in: ["flater1c"]
+                        timeout: [1m]
+
+                -   name: dutctl
+                    label: Running FWTS Batch
+                    parameters:
+                        serverAddr: ["10.93.130.16"]
+                        command: ["serial"]
+                        in: ["fwts -b"]
+                        timeout: [5m]
+
+                -   name: dutctl
+                    label: Clean up. Shutdown the device.
+                    parameters:
+                        serverAddr: ["10.93.130.16"]
+                        command: ["power"]
+                        args: ["off"]
+
+Reporting:
+    RunReporters:
+        -   name: TargetSuccess
+            parameters:
+                SuccessExpression: "=100%"

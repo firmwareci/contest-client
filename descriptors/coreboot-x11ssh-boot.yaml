@@ -38,13 +38,31 @@ TestDescriptors:
                         args: ["off"]
 
                 -   name: dutctl
-                    label: Conduct the boot test.
+                    label: Boot to OS Shell
                     parameters:
                         serverAddr: ["10.93.130.16"]
                         command: ["power"]
                         args: ["on"]
-                        expect: ["Welcome to u-root!"]
-                        timeout: [2m]
+                        expect: ["x11ssh login:"]
+                        timeout: [5m]
+
+                -   name: dutctl
+                    label: Login - username
+                    parameters:
+                        serverAddr: ["10.93.130.16"]
+                        command: ["serial"]
+                        expect: ["Password"]
+                        in: ["oscar"]
+                        timeout: [1m]
+                
+                -   name: dutctl
+                    label: Login - Password
+                    parameters:
+                        serverAddr: ["10.93.130.16"]
+                        command: ["serial"]
+                        expect: ["Last login:"]
+                        in: ["flater1c"]
+                        timeout: [1m]
 
                 -   name: dutctl
                     label: Clean up. Shutdown the device.
